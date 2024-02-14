@@ -1,0 +1,15 @@
+---
+- name: create a volume
+  gather_facts: no
+  hosts: localhost
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: create new volume in the stretched pods
+      delegate_to: localhost
+      purestorage.flasharray.purefa_volume:
+        name: "{{ pod_name }}::{{ vol_name }}"
+        size: "{{ vol_size }}"
+        fa_url: "{{ fa_url1 }}"
+        api_token: "{{ api_token1 }}"
+        state: "{{ vol_state | default('present') }}"

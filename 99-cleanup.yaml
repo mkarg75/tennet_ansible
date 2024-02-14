@@ -1,0 +1,55 @@
+- name: unstretch pod
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+    - vars.yaml
+  tasks:
+    - name: detach the volume from the hostgroup
+      delegate_to: localhost
+      purestorage.flasharray.purefa_hg:
+        hostgroup: "{{ hostgroup }}"
+        volume: "{{ pod_name }}::{{ vol_name }}"
+        state: absent
+        fa_url: "{{ item.fa_url }}"
+        api_token: "{{ item.api_token }}"
+      loop:
+        - { fa_url: "{{ fa_url1 }}", api_token: "{{ api_token1 }}" }
+        - { fa_url: "{{ fa_url2 }}", api_token: "{{ api_token2 }}" }
+
+    - name: delete the volume
+      delegate_to: localhost
+      purestorage.flasharray.purefa_volume:
+        name: "{{ pod_name }}::{{ vol_name }}"
+        eradicate: false
+        fa_url: "{{ fa_url1 }}"
+        api_token: "{{ api_token1 }}"
+        state: absent
+
+    - name: unstretch the pod 
+      delegate_to: localhost
+      purestorage.flasharray.purefa_pod:
+        fa_url: "{{ fa_url1 }}"
+        api_token: "{{ api_token1 }}"
+        name: "{{ pod_name }}"
+        stretch: "{{ stretch_target }}"
+        state: absent
+        
+    - name: delete and eradicate the pod
+      delegate_to: localhost
+      purestorage.flasharray.purefa_pod:
+        fa_url: "{{ fa_url1 }}"
+        api_token: "{{ api_token1 }}"
+        name: "{{ pod_name }}"
+        eradicate: true
+        state: absent
+    
+    - name: delete the hostgroup
+      delegate_to: localhost
+      purestorage.flasharray.purefa_hg:
+        hostgroup: "{{ hostgroup }}"
+        state: absent
+        fa_url: "{{ item.fa_url }}"
+        api_token: "{{ item.api_token }}"
+      loop:
+        - { fa_url: "{{ fa_url1 }}", api_token: "{{ api_token1 }}" }
+        - { fa_url: "{{ fa_url2 }}", api_token: "{{ api_token2 }}" }

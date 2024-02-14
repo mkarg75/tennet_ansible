@@ -1,0 +1,17 @@
+- name: attach volume to hostgroups
+  hosts: localhost
+  gather_facts: no
+  vars_files: 
+    - vars.yaml
+  tasks:
+    - name: attach volume to hostgroup on both arrays
+      delegate_to: localhost
+      purestorage.flasharray.purefa_hg:
+        hostgroup: "{{ hostgroup }}"
+        fa_url: "{{ item.fa_url }}"
+        api_token: "{{ item.api_token }}"
+        volume:
+          - "{{ pod_name }}::{{ vol_name }}"
+      loop:
+        - { fa_url: "{{ fa_url1 }}", api_token: "{{ api_token1 }}" }
+        - { fa_url: "{{ fa_url2 }}", api_token: "{{ api_token2 }}" }
